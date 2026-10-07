@@ -5,7 +5,9 @@ Hi everyone, I want to share a **secret weapon** for tabular data problems. Ther
 With **Tabular Foundation Models (TFMs)**, we just predict the labels of test data! Its so easy and so powerful! There is nothing for us to do! 🎉
 
 # Frontier TFMs
-TFMs have improved greatly in the past few months. The models below are the current SOTA and they are achieving these CV scores using `train.csv` as is with **no feature engineering**. That is amazing. These scores are beating GBDTs and MLPs that require hyperparameter tuning and feature engineering!
+TFMs have improved greatly in the past few months (official TabArena leaderboard [here][7]). The models below are the current SOTA and they are achieving these CV scores using `train.csv` as is with **no feature engineering** and **no training**. That is amazing. These scores are beating GBDTs and MLPs that require hyperparameter tuning and feature engineering! (official TabArena leaderboard [here][7])
+
+Below shows the performance of TFMs on our current October Kaggle Playground competition data (with statistics from running on 1xA100 GPU offline):
 
 | Model | Precision | **OOF AUC** | Fit h (5 folds) | Predict h (5 folds) | Total GPU h | Peak GB |
 |---|---|---:|---:|---:|---:|---:|
@@ -30,13 +32,22 @@ We observe that **TabPFN3.5** and **Kumo-Tabular large** both beat XGBoost and R
 # Kaggle Dataset
 I publish a Kaggle dataset [here][1] with each of these TFM's OOF and Test PREDS. They were inferred offline using `StratifiedKFold(5, shuffle=True, random_state=42)` on my local A100 GPU.
 
-# Starter Notebook
+# Starter Notebooks
 I publish a Kaggle starter notebook [here][2] demonstrating how to infer [**NVIDIA's Kumo-Tabular**][4] on this month's October playground competition data. And @philippsinger published a starter notebook [here][3] demonstrating how to infer [Prior Labs' TabPFN][5] on July playground competition data.
+
+I publish an ensemble of TFMs with public OOFs [here][6] demonstrating how TFMs improve the current best public ensemble from **LB 0.96167 => LB 0.96176**! 🔥 When looking at model importance, we see that 5 of the top 20 (out of 135) models are TFMs!
+
+# Next Steps
+Even though feature engineering and finetuning are **not required** as seen by the great results above. We can experiment with adding some features to see if it helps improve CV LB of individual models and/or stacks. Also we can consider finetuning these models on train.csv data too.
+
+When using Kaggle's GPUs, I suggest using only a few `n_estimators` (like 2) and reduced context (like 25k to 100k) for speed. When running offline with better GPU, then consider using more `n_estimators` and full context (i.e. 560k per fold) like the table above shows and the dataset's OOF are. For ensemble diversity, we still gain a lot using Kaggle GPUs and reductions.
 
 # Enjoy!
 
-[1]: ???
-[2]: ???
+[1]: https://www.kaggle.com/datasets/cdeotte/s6e10-tfm-oof-and-test-predictions
+[2]: https://www.kaggle.com/code/cdeotte/kumo-tabular-starter
 [3]: https://www.kaggle.com/code/philippsinger/tabpfn-3-starter-playground-series-s6e7
 [4]: https://huggingface.co/nvidia/Kumo-Tabular
 [5]: https://priorlabs.ai/tabpfn-3-5
+[6]: https://www.kaggle.com/code/cdeotte/stacking-tfms-with-public-oof
+[7]: https://huggingface.co/spaces/TabArena/leaderboard
